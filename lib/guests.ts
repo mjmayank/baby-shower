@@ -20,29 +20,76 @@ export interface Guest {
 export const GUESTS: Guest[] = [
   // --- REPLACE THESE SAMPLE ENTRIES WITH YOUR REAL GUEST LIST -------------
   {
-    name: "Priya Sharma",
-    attributes: ["amazing home cooking", "marathon running", "always carrying a giant water bottle"],
-    email: "priya@example.com",
+    name: "Allison Chou",
+    attributes: ["wedding dresses", "comedy", "traveling"],
   },
   {
-    name: "David Chen",
-    attributes: ["board game obsession", "craft coffee snobbery", "dad jokes"],
-    email: "david@example.com",
+    name: "Michael Chan",
+    attributes: ["tennis"],
   },
   {
-    name: "Sofia Martinez",
-    attributes: ["gardening", "salsa dancing", "rescuing stray cats"],
-    email: "sofia@example.com",
+    name: "Deets",
+    attributes: ["soccer", "JP Morgan", ],
   },
   {
-    name: "James Okafor",
-    attributes: ["basketball", "grilling the perfect steak", "loud infectious laugh"],
-    email: "james@example.com",
+    name: "Nehal",
+    attributes: ["baking", "crochet"],
   },
   {
-    name: "Emily Nguyen",
-    attributes: ["watercolor painting", "hiking every weekend", "matcha lattes"],
-    email: "emily@example.com",
+    name: "Sonia Xu",
+    attributes: ["pharmacy benefits management", "Small Pomsky dog"],
+  },
+  {
+    name: "Jacob Simon",
+    attributes: ["technology", "small Pomsky dog", "Nathan Fielder"],
+  },
+  {
+    name: "Arushi",
+    attributes: ["modular synthesizer and making music"],
+  },
+  {
+    name: "Hareesh",
+    attributes: ["DJing", "playing music", "coding"],
+  },
+  {
+    name: "Katrina",
+    attributes: ["Soccer World Cup", "Walking the El Camino", "dancing", "scuba diving"],
+  },
+  {
+    name: "Kailyn",
+    attributes: ["Fujifilm camera", "Capital One Venture X Credit Card", "red"],
+  },
+  {
+    name: "Josh B",
+    attributes: ["Beer", "Small tattoos", "movies", "Miami Heat basketball"],
+  },
+  {
+    name: "Jay B",
+    attributes: ["soccer", "35mm film cameras", "skiing"],
+  },
+  {
+    name: "Amy",
+    attributes: ["sewing", ""],
+  },
+  {
+    name: "Priyanka",
+    attributes: ["Taylor Swift", "Womens health"],
+  },
+  {
+    name: "Nick D",
+    attributes: ["Skiing", "Music and DJing"],
+  },
+  {
+    name: "Arjun B",
+    attributes: ["Golden State Warriors"],
+  },
+  {
+    name: "Jonathan O",
+    attributes: ["Marathon running", "taxis"],
+  },
+  {
+    name: "Meredith",
+    attributes: ["Hawaii", "comedy", "music"],
   },
   // ------------------------------------------------------------------------
 ];
