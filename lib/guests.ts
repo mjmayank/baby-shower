@@ -81,7 +81,7 @@ export const GUESTS: Guest[] = [
   },
   {
     name: "Arjun B",
-    attributes: ["Golden State Warriors"],
+    attributes: ["Golden State Warriors", "Cryptocurrrency"],
   },
   {
     name: "Jonathan O",
@@ -90,6 +90,10 @@ export const GUESTS: Guest[] = [
   {
     name: "Meredith",
     attributes: ["Hawaii", "comedy", "music"],
+  },
+  {
+    name: "Emon",
+    attributes: ["Elon Musk", "cryptocurrency", "concussion protocol"],
   },
   // ------------------------------------------------------------------------
 ];
