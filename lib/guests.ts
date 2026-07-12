@@ -95,6 +95,14 @@ export const GUESTS: Guest[] = [
     name: "Emon",
     attributes: ["Elon Musk", "cryptocurrency", "concussion protocol"],
   },
+  {
+    name: "Stacey Zhou",
+    attributes: ["Corporate finance", "skiing", "painting", "Australian Shepherd with a copper-brown and white coat"],
+  },
+  {
+    name: "Will Bannister",
+    attributes: ["stock market investing", "skiing", "Citibiking", "Australian Shepherd with a copper-brown and white coat"],
+  },
   // ------------------------------------------------------------------------
 ];
 

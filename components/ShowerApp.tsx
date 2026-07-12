@@ -241,7 +241,7 @@ export default function ShowerApp() {
             </div>
           ) : (
             <p className="subtitle">
-              List a few things you&apos;re known for — hobbies, obsessions, signature moves.
+              List a few things you&apos;re known for — hobbies, obsessions, signature moves, pets (breed and color).
               They&apos;ll show up in your baby caricature!
             </p>
           )}
@@ -252,7 +252,7 @@ export default function ShowerApp() {
               rows={3}
               value={attributesText}
               onChange={(e) => setAttributesText(e.target.value)}
-              placeholder="e.g. surfing, baking sourdough, karaoke nights"
+              placeholder="e.g. surfing, baking sourdough, karaoke nights, Australian Shepherd with a copper-brown and white coat"
             />
           </div>
           <div className="button-row">
