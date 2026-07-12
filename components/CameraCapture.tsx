@@ -65,7 +65,9 @@ export default function CameraCapture({ photo, onCapture, onRetake }: Props) {
       1024,
       1024
     );
-    onCapture(canvas.toDataURL("image/png"));
+    // JPEG keeps the payload ~10x smaller than PNG — Vercel rejects request
+    // bodies over 4.5MB, and webcam PNGs regularly blow past that.
+    onCapture(canvas.toDataURL("image/jpeg", 0.9));
   }
 
   return (

@@ -55,6 +55,26 @@ Open http://localhost:3000, put the laptop in a visible spot, and you're done.
 Camera access requires **https or localhost**, so running locally on the booth
 laptop is the easy path. Everything works offline-hostable — no deploy needed.
 
+## Hosting on Vercel
+
+Works, with three things to know:
+
+- **4.5MB request-body cap.** Vercel drops uploads bigger than this, which the
+  browser reports as a generic "Failed to fetch". The camera captures as JPEG
+  (~200–400KB) specifically to stay far under it.
+- **Function duration.** The route sets `maxDuration = 300`; high-quality
+  generations take 1–2+ minutes. Make sure your plan/Fluid Compute settings
+  allow it (Project → Settings → Functions), or 504s will show up.
+- **No local backups.** Vercel's filesystem is read-only, so the `generated/`
+  folder only works when running on a real machine — on Vercel, the organizer
+  email is the backup copy.
+
+**Debugging:** every request gets a short id (e.g. `[generate a1b2c3]`) that
+appears in both the on-screen error toast and the server logs (Vercel
+dashboard → Project → Logs). Each request logs its photo size, generation
+time, and delivery outcome, and failures on the booth screen show an HTTP
+status + explanation with a **Retry** button that resends the same photo.
+
 ## Costs (roughly, for 40 guests)
 
 `gpt-image-2` at high quality: roughly $0.10–0.25/image → **~$5–10 total**

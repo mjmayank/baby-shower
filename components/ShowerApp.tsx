@@ -10,6 +10,31 @@ type Step = "splash" | "details" | "attributes" | "camera" | "magic" | "thanks";
 
 const STEPS: Step[] = ["splash", "details", "attributes", "camera", "magic", "thanks"];
 
+interface GeneratePayload {
+  name: string;
+  email: string;
+  attributes: string[];
+  imageDataUrl: string;
+}
+
+interface FailedJob {
+  id: number;
+  name: string;
+  message: string;
+  payload: GeneratePayload;
+}
+
+/** Turn a failed request into a message specific enough to act on. */
+function describeError(err: unknown, payloadBytes: number): string {
+  const mb = (payloadBytes / 1024 / 1024).toFixed(1);
+  if (err instanceof TypeError) {
+    // fetch() rejects with TypeError when no HTTP response arrived at all:
+    // wifi drop, server unreachable, or the connection was cut mid-upload.
+    return `Upload never reached the server (photo payload ${mb}MB) — usually a wifi drop. Tap Retry.`;
+  }
+  return err instanceof Error ? err.message : String(err);
+}
+
 export default function ShowerApp() {
   const [step, setStep] = useState<Step>("splash");
   const [name, setName] = useState("");
@@ -19,6 +44,7 @@ export default function ShowerApp() {
   const [matchedGuest, setMatchedGuest] = useState<Guest | null>(null);
   const [pending, setPending] = useState(0);
   const [errors, setErrors] = useState<string[]>([]);
+  const [failed, setFailed] = useState<FailedJob[]>([]);
 
   // Dev nicety: jump straight to a screen with e.g. localhost:3000/?step=magic
   useEffect(() => {
@@ -50,16 +76,8 @@ export default function ShowerApp() {
     setStep("attributes");
   }
 
-  function submit() {
-    if (!photo) return;
-    const payload = {
-      name: name.trim(),
-      email: email.trim(),
-      attributes: attributesText.split(",").map((a) => a.trim()).filter(Boolean),
-      imageDataUrl: photo,
-    };
-    // Fire and forget: the thank-you screen shows immediately and the next
-    // guest can start while this generates in the background.
+  function startJob(payload: GeneratePayload) {
+    const payloadBytes = payload.imageDataUrl.length;
     setPending((p) => p + 1);
     fetch("/api/generate", {
       method: "POST",
@@ -67,21 +85,57 @@ export default function ShowerApp() {
       body: JSON.stringify(payload),
     })
       .then(async (res) => {
-        const data = await res.json().catch(() => ({}));
+        const text = await res.text();
+        let data: { ok?: boolean; error?: string; problems?: string[]; requestId?: string } = {};
+        try {
+          data = JSON.parse(text);
+        } catch {
+          /* non-JSON response (e.g. a Vercel error page) — handled below */
+        }
         if (!res.ok || !data.ok) {
-          throw new Error(data.error || `Request failed (${res.status})`);
+          const detail = data.error || text.slice(0, 200) || "no response body";
+          const tag = data.requestId ? ` [server log id: ${data.requestId}]` : "";
+          if (res.status === 413) {
+            throw new Error(`Photo upload too large (HTTP 413 — Vercel caps requests at 4.5MB): ${detail}${tag}`);
+          }
+          if (res.status === 504) {
+            throw new Error(`Server timed out mid-generation (HTTP 504 — check the function's maxDuration on your Vercel plan): ${detail}${tag}`);
+          }
+          throw new Error(`Server error (HTTP ${res.status}): ${detail}${tag}`);
         }
         if (data.problems?.length) {
-          setErrors((e) => [...e, ...data.problems.map((p: string) => `${payload.name}: ${p}`)]);
+          setErrors((e) => [...e, ...data.problems!.map((p: string) => `${payload.name}: ${p}`)]);
         }
       })
       .catch((err) => {
-        setErrors((e) => [
-          ...e,
-          `${payload.name}: ${err instanceof Error ? err.message : String(err)}`,
+        setFailed((f) => [
+          ...f,
+          {
+            id: Date.now() + Math.random(),
+            name: payload.name,
+            message: describeError(err, payloadBytes),
+            payload,
+          },
         ]);
       })
       .finally(() => setPending((p) => p - 1));
+  }
+
+  function retryJob(job: FailedJob) {
+    setFailed((f) => f.filter((x) => x.id !== job.id));
+    startJob(job.payload);
+  }
+
+  function submit() {
+    if (!photo) return;
+    // Fire and forget: the magic + thank-you screens show immediately and the
+    // next guest can start while this generates in the background.
+    startJob({
+      name: name.trim(),
+      email: email.trim(),
+      attributes: attributesText.split(",").map((a) => a.trim()).filter(Boolean),
+      imageDataUrl: photo,
+    });
     setStep("magic");
   }
 
@@ -255,11 +309,34 @@ export default function ShowerApp() {
         </div>
       )}
 
-      {errors.length > 0 && (
-        <div className="error-toast" onClick={() => setErrors([])}>
-          <strong>⚠️ Needs attention (tap to dismiss):</strong>
+      {(errors.length > 0 || failed.length > 0) && (
+        <div className="error-toast">
+          <div className="error-toast-header">
+            <strong>⚠️ Needs attention</strong>
+            <button
+              className="toast-dismiss"
+              onClick={() => {
+                setErrors([]);
+                setFailed([]);
+              }}
+            >
+              ✕ Dismiss all
+            </button>
+          </div>
+          {failed.map((job) => (
+            <div key={job.id} className="error-row">
+              <span>
+                <strong>{job.name}:</strong> {job.message}
+              </span>
+              <button className="retry-btn" onClick={() => retryJob(job)}>
+                🔁 Retry
+              </button>
+            </div>
+          ))}
           {errors.slice(-3).map((e, i) => (
-            <div key={i}>{e}</div>
+            <div key={i} className="error-row">
+              <span>{e}</span>
+            </div>
           ))}
         </div>
       )}
