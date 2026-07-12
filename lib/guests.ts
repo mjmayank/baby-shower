@@ -1,14 +1,13 @@
 // ============================================================================
-// GUEST LIST — edit this file before the party!
+// GUEST LIST — seed data
+//
+// The live guest list is stored in Redis and edited at /admin (see
+// lib/guestStore.ts). This file seeds Redis on first run and is the fallback
+// when Redis isn't configured.
 //
 // For each guest, list the things they're known for. These get woven into the
 // image prompt ("Add items to reflect that they're known for ...").
-//
-// - `email` (optional) prefills the email field when the guest picks their
-//   name, so they don't have to type it on the booth laptop.
-// - Matching is by name, case/whitespace-insensitive. Guests also get
-//   tap-to-select suggestions as they type.
-// - Guests not on this list get a screen to type their own attributes.
+// `email` (optional) prefills the email field when the guest picks their name.
 // ============================================================================
 
 export interface Guest {
@@ -117,9 +116,4 @@ export const GUESTS: Guest[] = [
 /** Normalize a name for matching: lowercase, collapse whitespace. */
 export function normalizeName(name: string): string {
   return name.trim().toLowerCase().replace(/\s+/g, " ");
-}
-
-export function findGuest(name: string): Guest | undefined {
-  const n = normalizeName(name);
-  return GUESTS.find((g) => normalizeName(g.name) === n);
 }

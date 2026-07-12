@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { GUESTS, findGuest, normalizeName, type Guest } from "@/lib/guests";
+import { normalizeName, type Guest } from "@/lib/guests";
 import CameraCapture from "./CameraCapture";
 import MagicScreen from "./MagicScreen";
 import OceanDecor from "./OceanDecor";
@@ -45,6 +45,7 @@ export default function ShowerApp() {
   const [pending, setPending] = useState(0);
   const [errors, setErrors] = useState<string[]>([]);
   const [failed, setFailed] = useState<FailedJob[]>([]);
+  const [guests, setGuests] = useState<Guest[]>([]);
 
   // Dev nicety: jump straight to a screen with e.g. localhost:3000/?step=magic
   useEffect(() => {
@@ -52,17 +53,31 @@ export default function ShowerApp() {
     if (requested && STEPS.includes(requested)) setStep(requested);
   }, []);
 
+  // Load the guest list, and refresh it each time a guest reaches the name
+  // screen so /admin edits show up without reloading the kiosk.
+  useEffect(() => {
+    if (step !== "splash" && step !== "details") return;
+    fetch("/api/guests", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data.guests)) setGuests(data.guests);
+      })
+      .catch(() => {
+        /* keep the previous list; suggestions just won't refresh */
+      });
+  }, [step]);
+
   const suggestions = useMemo(() => {
     const n = normalizeName(name);
     if (n.length === 0) return [];
     // Names starting with the typed text rank above substring matches, and an
     // exact match stays visible so guests can still tap it to confirm.
-    const starts = GUESTS.filter((g) => normalizeName(g.name).startsWith(n));
-    const contains = GUESTS.filter(
+    const starts = guests.filter((g) => normalizeName(g.name).startsWith(n));
+    const contains = guests.filter(
       (g) => !normalizeName(g.name).startsWith(n) && normalizeName(g.name).includes(n)
     );
     return [...starts, ...contains].slice(0, 5);
-  }, [name]);
+  }, [name, guests]);
 
   function selectGuest(guest: Guest) {
     setName(guest.name);
@@ -74,7 +89,7 @@ export default function ShowerApp() {
   }
 
   function goToAttributes() {
-    const guest = findGuest(name);
+    const guest = guests.find((g) => normalizeName(g.name) === normalizeName(name));
     setMatchedGuest(guest ?? null);
     setAttributesText(guest ? guest.attributes.join(", ") : "");
     setStep("attributes");

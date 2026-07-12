@@ -27,12 +27,19 @@ regardless of whether the email sends.
 npm install
 ```
 
-### 1. Edit the guest list
+### 1. The guest list & admin panel
 
-Open [`lib/guests.ts`](lib/guests.ts) and replace the sample entries with your
-~40 real guests: name, what they're known for, and (optionally) email so it's
-prefilled for them. This is the only "database" — everything is hardcoded on
-purpose.
+The guest list lives in Redis (see below) and is editable at **`/admin`** —
+add guests, tweak their "known for" attributes, and changes go live at the
+booth immediately, no deploy needed. Saving requires the `ADMIN_PASSWORD`
+env var.
+
+Storage setup (one-time): in the Vercel dashboard go to **Storage → Upstash
+for Redis** and attach it to the project — the `KV_REST_API_*` env vars are
+injected automatically. On first read the store is seeded from the hardcoded
+list in [`lib/guests.ts`](lib/guests.ts), which also serves as the fallback
+when Redis isn't configured (in that mode, admin edits only last until the
+server restarts — the admin panel warns you).
 
 ### 2. Fill in `.env` (or `.env.local`)
 
@@ -42,6 +49,8 @@ purpose.
 | `ORGANIZER_EMAIL` | You always get an email copy of every caricature, subject includes the guest's name |
 | `SMTP_HOST/PORT/USER/PASS/FROM` | Email sending. Gmail works well: use an [App Password](https://myaccount.google.com/apppasswords) (regular passwords are rejected). |
 | `IMAGE_QUALITY` | `low` / `medium` / `high` (default `high` — best results, ~1 min/image) |
+| `ADMIN_PASSWORD` | Required to save changes in the `/admin` guest list editor |
+| `KV_REST_API_URL` / `KV_REST_API_TOKEN` | Injected by the Upstash Redis integration; make guest-list edits persistent |
 
 ### 3. Run it
 
