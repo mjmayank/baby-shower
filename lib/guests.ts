@@ -103,6 +103,14 @@ export const GUESTS: Guest[] = [
     name: "Will Bannister",
     attributes: ["stock market investing", "skiing", "Citibiking", "Australian Shepherd with a copper-brown and white coat"],
   },
+  {
+    name: "Shriram Sundararaman",
+    attributes: ["doctor", "basketball", "bollywood dance", "fantasy football"],
+  },
+  {
+    name: "Swathi Raman",
+    attributes: ["doctor", "bollywood dance", "philadelphia eagles"],
+  },
   // ------------------------------------------------------------------------
 ];
 
