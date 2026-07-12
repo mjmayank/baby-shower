@@ -54,10 +54,14 @@ export default function ShowerApp() {
 
   const suggestions = useMemo(() => {
     const n = normalizeName(name);
-    if (n.length < 2) return [];
-    const matches = GUESTS.filter((g) => normalizeName(g.name).includes(n));
-    if (matches.length === 1 && normalizeName(matches[0].name) === n) return [];
-    return matches.slice(0, 5);
+    if (n.length === 0) return [];
+    // Names starting with the typed text rank above substring matches, and an
+    // exact match stays visible so guests can still tap it to confirm.
+    const starts = GUESTS.filter((g) => normalizeName(g.name).startsWith(n));
+    const contains = GUESTS.filter(
+      (g) => !normalizeName(g.name).startsWith(n) && normalizeName(g.name).includes(n)
+    );
+    return [...starts, ...contains].slice(0, 5);
   }, [name]);
 
   function selectGuest(guest: Guest) {
