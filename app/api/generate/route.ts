@@ -15,10 +15,16 @@ function buildPrompt(attributes: string[]): string {
     ? `Add items to reflect that they're known for ${attrText}. `
     : "";
   return (
-    "Transform this photo into a cute Pixar/Disney-style baby caricature: " +
-    "keep the person's key facial features (hairstyle, hair color, eye shape, skin tone, notable expressions, and glasses or facial hair if present) " +
-    "but render them as an adorable cartoon infant. Big round eyes, soft chubby cheeks, " +
-    "oversized head-to-body ratio, warm pastel color palette. " +
+    "Transform this photo into a cute Pixar/Disney-style baby caricature of this specific person — " +
+    "the result should be instantly recognizable as them, not a generic baby. " +
+    "Faithfully preserve: their exact hairstyle (length, cut, curl or straightness, parting) and hair color " +
+    "including any highlights; their eye color and eye shape — enlarge the eyes only moderately and keep " +
+    "their real shape rather than defaulting to big round eyes; eyebrow shape; skin tone; face shape; " +
+    "their smile and expression; and glasses, facial hair, freckles, moles, or dimples if present. " +
+    "Keep distinctive accessories such as earrings, necklaces, headbands, or hair clips, and dress the baby " +
+    "in a baby-sized version of their actual outfit. " +
+    "Render them as an adorable cartoon infant with soft chubby cheeks and an oversized head-to-body ratio, " +
+    "warm pastel color palette. " +
     attrSentence +
     "Clean simple background, soft studio lighting, high-quality illustration style, no text."
   );
