@@ -4,6 +4,7 @@ import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 import { deliver } from "@/lib/delivery";
+import { addFooterStrip } from "@/lib/branding";
 
 export const runtime = "nodejs";
 export const maxDuration = 300; // image generation can take a couple of minutes
@@ -87,6 +88,15 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return fail(502, `Image generation failed (${model}, quality=${quality}): ${message}`, err);
+  }
+
+  // Add the white footer strip with the event name. If that ever fails, the
+  // unbranded image still goes out — better than no image at all.
+  try {
+    generated = await addFooterStrip(generated);
+    log(`footer strip added, final image ${(generated.length / 1024).toFixed(0)}KB`);
+  } catch (err) {
+    console.error(`[generate ${reqId}] footer strip failed, sending unbranded image:`, err);
   }
 
   // Keep a local copy when running on a real machine. On Vercel the
